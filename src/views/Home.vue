@@ -1,18 +1,47 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <h1>Ships info</h1>
+    <Table v-if="ships" :ships.sync="ships" @switchPage="switchPage" />
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
+import Table from "../components/Table"
+import { starWorsApi } from "../api"
+import { mapGetters } from "vuex"
 
 export default {
-  name: 'Home',
+  name: "Home",
   components: {
-    HelloWorld
-  }
+    Table,
+  },
+  data() {
+    return {
+      ships: null,
+    }
+  },
+  mounted() {
+    // get respone
+    this.getResponse()
+  },
+  methods: {
+    async getResponse() {
+      this.$store.dispatch("fetchResponse", starWorsApi.starships).then(() => {
+        this.ships = this.getShips
+      })
+    },
+    async switchPage(id) {
+      console.log("switchPage", id)
+      this.$store.dispatch(
+        "fetchResponseSwitchPage",
+        `http://swapi.dev/api/starships/?page=${id}`
+      )
+      this.ships = this.getShips
+    },
+  },
+  computed: {
+    ...mapGetters(["getShips"]),
+  },
 }
 </script>
